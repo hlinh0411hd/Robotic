@@ -35,7 +35,7 @@ class GazeboTurtlebotMazeColorEnv(gazebo_env.GazeboEnv):
         self.name_target = 'Target'
         self.name_hint = 'Hint'
 
-        self.target_pos = [[-0.25, -2], [6.5, -1.75], [6.5, 1.75], [8.5, 1.5]]
+        self.target_pos = [[-0.25, -2], [6.5, -1.75], [6.5, 1.75]]
         self.hint_pos = []
         hint_target = [[1.5, 0], [1.5, -2], [3, -2], [3, -3.75], [-0.25, -3.75]]
         self.hint_pos.append(hint_target);
@@ -52,6 +52,7 @@ class GazeboTurtlebotMazeColorEnv(gazebo_env.GazeboEnv):
         self.num_target = np.random.randint(3)
 
         self.num_hint = len(self.hint_pos[self.num_target])
+        self.checked_point = [0] * self.num_hint
         self.setTarget()
 
 
@@ -86,11 +87,12 @@ class GazeboTurtlebotMazeColorEnv(gazebo_env.GazeboEnv):
 
     def calculate_observation(self, data, pos):
         min_range = 0.21
+        min_range_target = 0.41
         done = False
         for i, item in enumerate(data.ranges):
             if (min_range > data.ranges[i] > 0):
                 done = True
-        if (self.calculate_distance(pos.x, pos.y, self.target_pos[self.num_target][0], self.target_pos[self.num_target][1]) < min_range):
+        if (self.calculate_distance(pos.x, pos.y, self.target_pos[self.num_target][0], self.target_pos[self.num_target][1]) < min_range_target):
             done = True
         return done
 
@@ -99,16 +101,19 @@ class GazeboTurtlebotMazeColorEnv(gazebo_env.GazeboEnv):
 
     def calculate_reward(self, done, pos):
         min_range = 0.21
+        min_range_target = 0.41
         reward = -1
         if (done):
-            if (self.calculate_distance(pos.x, pos.y, self.target_pos[self.num_target][0], self.target_pos[self.num_target][1]) < min_range):
+            if (self.calculate_distance(pos.x, pos.y, self.target_pos[self.num_target][0], self.target_pos[self.num_target][1]) < min_range_target):
                 reward = 200
             else:
                 reward = -200
         else:
             for i in range(self.num_hint):
-                if (self.calculate_distance(pos.x, pos.y, self.hint_pos[self.num_target][i][0], self.hint_pos[self.num_target][i][1]) < min_range):
+                if (self.checked_point[i] == 0 and self.calculate_distance(pos.x, pos.y, self.hint_pos[self.num_target][i][0], self.hint_pos[self.num_target][i][1]) < min_range):
                     reward = 10
+                    self.checked_point[i] = 1
+        print reward
         return reward
 
     def discretize_observation(self,data):
@@ -211,11 +216,8 @@ class GazeboTurtlebotMazeColorEnv(gazebo_env.GazeboEnv):
         state.pose= self.turtlebot_state.pose
         state.twist = self.turtlebot_state.twist
 
-        self.num_target = np.random.randint(3)
-
-        self.num_hint = len(self.hint_pos[self.num_target])
-        print self.num_target
         self.set_model(state)
+        self.checked_point = [0] * self.num_hint
 
         # self.num_target = np.random.randint(3)
 
