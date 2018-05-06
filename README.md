@@ -2,8 +2,10 @@
 
 ## Setting up
 Copy folder custom vao thu muc "gym_gazebo/envs"
+
 Copy folder launch, models, worlds vao thu muc "gym_gazebo/envs/assets". skip nhung file trung
-Copy fild __init__.py vao trong thu muc "gym_gazebo" (copy de)
+
+Copy file __init__.py vao trong thu muc "gym_gazebo" (copy de)
 
 vao trong thu muc "gym_gazebo/envs/assets/launch", mo file MazeColor.launch, sua truong defaul o
 "<arg name="world_file"  default="/home/hlinh0411hd/gym-gazebo/gym_gazebo/envs/installation/../assets/worlds/maze_color.world"/>"
