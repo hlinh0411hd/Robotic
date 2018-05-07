@@ -73,6 +73,7 @@ while True:
     for i in range(2000):
 
         #########get Action ########
+        qvalue = network.getQValues(observation)
         if config.total_step < config.pre_train_step:
             action = np.random.randint(env.num_action)
             total_random += 1
